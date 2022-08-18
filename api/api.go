@@ -2,7 +2,6 @@ package api
 
 import (
 	"DummyAlerts/api/handlers"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -11,7 +10,7 @@ func NewApi() *gin.Engine {
 	api.Use(handlers.ErrorHandler())
 
 	v1 := api.Group("/api/v1")
-	v1.POST("webhook", handlers.HandleWebhook)
+	v1.POST("webhook/:interpreter", handlers.HandleWebhook)
 
 	return api
 }
