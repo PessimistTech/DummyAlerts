@@ -2,18 +2,33 @@ package main
 
 import (
 	"DummyAlerts/api"
-	"DummyAlerts/messages"
-	"DummyAlerts/notifiers"
+	"DummyAlerts/config"
+
+	"github.com/sirupsen/logrus"
+	"github.com/spf13/viper"
 )
+
+func init() {
+	viper.SetConfigFile("./.config/dev.yaml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		logrus.WithError(err).Fatalf("unable to read in config")
+	}
+
+	var cfg config.Config
+	err = viper.Unmarshal(&cfg)
+	if err != nil {
+		logrus.WithError(err).Fatalf("unable to marshall config")
+	}
+
+	logrus.Infof("Config: %+v", cfg)
+
+	config.SetConfig(&cfg)
+}
 
 func main() {
 
 	webApi := api.NewApi()
-
-	// TODO: remove below discord test before merge/real use
-	discord := notifiers.DiscordNotifier{}
-	discord.InitDiscordClient()
-	discord.Notify(&messages.Message{})
 
 	webApi.Run(":8080")
 }

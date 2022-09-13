@@ -1,6 +1,7 @@
 package notifiers
 
 import (
+	"DummyAlerts/config"
 	"DummyAlerts/messages"
 	"fmt"
 	"os"
@@ -16,6 +17,8 @@ type DiscordNotifier struct {
 	client *discordgo.Session
 }
 
+var discord *DiscordNotifier
+
 func (dn *DiscordNotifier) InitDiscordClient() error {
 	token := os.Getenv(DISCORD_TOKEN)
 	session, err := discordgo.New(fmt.Sprintf("Bot %s", token))
@@ -26,8 +29,25 @@ func (dn *DiscordNotifier) InitDiscordClient() error {
 	return nil
 }
 
+func GetDiscordNotifier() (*DiscordNotifier, error) {
+	if discord == nil {
+		newNotifier := DiscordNotifier{}
+		err := newNotifier.InitDiscordClient()
+		if err != nil {
+			return nil, err
+		}
+		discord = &newNotifier
+	}
+
+	return discord, nil
+}
+
 func (d *DiscordNotifier) Notify(msg *messages.Message) error {
-	// TODO: get channel id from app config
-	d.client.ChannelMessageSend("<channelID>", "Test")
-	return nil
+	cfg := config.GetConfig()
+	channel, ok := cfg.Notifiers["discord"].Channels["primary"]
+	if !ok {
+		return fmt.Errorf("no primary channel found for discord notifier")
+	}
+	_, err := d.client.ChannelMessageSend(channel, fmt.Sprintf("%s\n%s", msg.Title, msg.Content))
+	return err
 }

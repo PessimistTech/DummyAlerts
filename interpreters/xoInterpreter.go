@@ -45,7 +45,8 @@ func (xi *XOInterpreter) Interpret(input []byte) (*messages.Message, error) {
 		return &messages.Message{}, err
 	}
 	message := &messages.Message{
-		Source: "Xen Orchestra",
+		Source:      "Xen Orchestra",
+		Interpreter: "xo",
 	}
 
 	switch event.Method {
@@ -65,19 +66,18 @@ func handleBackupRunJob(event XOEvent, message *messages.Message) (*messages.Mes
 	message.Event = event.Method
 
 	if event.Type == "pre" {
-		message.Title = "Backup job started"
+		message.Title = "**Backup job started**"
 		message.Level = messages.INFO
 	}
 
 	result := "succeeded"
-	if !(event.Error.Name == "") {
-		message.Level = messages.ERROR
-		message.Content = fmt.Sprintf("%s [%s]", event.Error.Message, message.Content)
+	if !event.Result {
 		result = "failed"
+		message.Level = messages.ERROR
+		message.Content = fmt.Sprintf("%s ```%s```", event.Error.Message, message.Content)
 	}
-
 	if event.Type == "post" {
-		message.Title = fmt.Sprintf("Backup job %s", result)
+		message.Title = fmt.Sprintf("**Backup job %s**", result)
 	}
 
 	return message, nil

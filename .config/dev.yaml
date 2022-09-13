@@ -1,0 +1,10 @@
+app:
+
+interpreters:
+  - "xo":
+      enabled: true
+
+notifiers:
+  - "discord":
+      channels:
+        - "primary": "895832743886323717"

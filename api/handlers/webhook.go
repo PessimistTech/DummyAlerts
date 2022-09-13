@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"DummyAlerts/config"
 	"DummyAlerts/interpreters"
+	"DummyAlerts/notifiers"
 	"io/ioutil"
 	"net/http"
 
@@ -36,6 +38,17 @@ func interpretBody(body []byte, interpreterStr string) {
 		return
 	}
 
+	cfg := config.GetConfig()
+
 	logrus.Infof("Message: %+v", message)
-	// TODO: send message to notifier. func call?? buffered channel with processing thread?
+	for name := range cfg.Notifiers {
+		notifier, err := notifiers.GetNotifier(name)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get notifier")
+		}
+		err = notifier.Notify(message)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to send notification")
+		}
+	}
 }

@@ -7,6 +7,7 @@ const (
 
 type Message struct {
 	Source          string
+	Interpreter     string
 	Content         string
 	Title           string
 	Level           string
