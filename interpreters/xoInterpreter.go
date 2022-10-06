@@ -40,6 +40,7 @@ func NewXOInterpreter() *XOInterpreter {
 
 func (xi *XOInterpreter) Interpret(input []byte) (*messages.Message, error) {
 	var event XOEvent
+	event.Result = true
 	err := json.Unmarshal(input, &event)
 	if err != nil {
 		return &messages.Message{}, err

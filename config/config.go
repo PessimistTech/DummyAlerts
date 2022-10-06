@@ -15,6 +15,7 @@ type InterpreterConfig struct {
 
 type NotifierConfig struct {
 	Channels map[string]string
+	Levels   map[string]bool
 }
 
 var config *Config

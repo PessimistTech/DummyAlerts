@@ -8,3 +8,6 @@ notifiers:
   - "discord":
       channels:
         - "primary": "895832743886323717"
+      levels:
+        - "ERROR": true
+        - "INFO": false

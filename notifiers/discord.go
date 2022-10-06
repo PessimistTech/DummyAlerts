@@ -44,7 +44,15 @@ func GetDiscordNotifier() (*DiscordNotifier, error) {
 
 func (d *DiscordNotifier) Notify(msg *messages.Message) error {
 	cfg := config.GetConfig()
-	channel, ok := cfg.Notifiers["discord"].Channels["primary"]
+	notifierCfg, ok := cfg.Notifiers["discord"]
+	if !ok {
+		return fmt.Errorf("notifier not configured")
+	}
+	val, ok := notifierCfg.Levels[msg.Level]
+	if !val || !ok {
+		return nil
+	}
+	channel, ok := notifierCfg.Channels["primary"]
 	if !ok {
 		return fmt.Errorf("no primary channel found for discord notifier")
 	}
