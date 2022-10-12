@@ -40,7 +40,6 @@ func NewXOInterpreter() *XOInterpreter {
 
 func (xi *XOInterpreter) Interpret(input []byte) (*messages.Message, error) {
 	var event XOEvent
-	event.Result = true
 	err := json.Unmarshal(input, &event)
 	if err != nil {
 		return &messages.Message{}, err
@@ -65,10 +64,11 @@ func handleBackupRunJob(event XOEvent, message *messages.Message) (*messages.Mes
 	}
 	message.Content = string(jsonStr)
 	message.Event = event.Method
+	message.Level = messages.INFO
 
 	if event.Type == "pre" {
 		message.Title = "**Backup job started**"
-		message.Level = messages.INFO
+		return message, nil
 	}
 
 	result := "succeeded"
@@ -77,9 +77,8 @@ func handleBackupRunJob(event XOEvent, message *messages.Message) (*messages.Mes
 		message.Level = messages.ERROR
 		message.Content = fmt.Sprintf("%s ```%s```", event.Error.Message, message.Content)
 	}
-	if event.Type == "post" {
-		message.Title = fmt.Sprintf("**Backup job %s**", result)
-	}
+
+	message.Title = fmt.Sprintf("**Backup job %s**", result)
 
 	return message, nil
 }
